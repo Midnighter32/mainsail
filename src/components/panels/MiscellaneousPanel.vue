@@ -20,6 +20,19 @@
                 :max="object.max_power"
                 :multi="parseInt(object.scale)"></miscellaneous-slider>
         </div>
+        <div v-for="(object, index) of servos" :key="'servo_' + object.name">
+            <v-divider v-if="index"></v-divider>
+            <miscellaneous-slider
+                :name="object.name"
+                :type="object.type"
+                :target="0"
+                :rpm="null"
+                :controllable="true"
+                :multi="object.maximum_angle"
+                :off_below="0"
+                :max="object.maximum_angle"
+                :pwm="true"></miscellaneous-slider>
+        </div>
         <div v-for="(light, index) of lights" :key="'light_' + light.name">
             <v-divider v-if="index || miscellaneous.length"></v-divider>
             <miscellaneous-slider
@@ -67,6 +80,10 @@ export default class MiscellaneousPanel extends Mixins(BaseMixin) {
 
     get lights() {
         return this.$store.getters['printer/getLights'] ?? []
+    }
+
+    get servos() {
+        return this.$store.getters['printer/getServos'] ?? []
     }
 
     get showMiscellaneousPanel() {

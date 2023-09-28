@@ -14,6 +14,7 @@
                     <v-icon v-else-if="type === 'led'" class="mr-2" small :retain-focus-on-click="true" @click="ledOn">
                         {{ mdiLightbulbOutline }}
                     </v-icon>
+                    <v-icon v-else-if="type === 'servo'" class="mr-2" small>{{ mdiServo }}</v-icon>
                     <v-icon v-else-if="type !== 'output_pin'" small :class="fanClasses">{{ mdiFan }}</v-icon>
                     <span>{{ convertName(name) }}</span>
                     <v-spacer></v-spacer>
@@ -101,10 +102,14 @@ import {
     mdiLightbulbOutline,
     mdiLightbulbOnOutline,
 } from '@mdi/js'
+import {
+    mdiServo
+} from "../../assets/icons/mdi"
 
 @Component
 export default class MiscellaneousSlider extends Mixins(BaseMixin) {
     mdiFan = mdiFan
+    mdiServo = mdiServo
     mdiToggleSwitch = mdiToggleSwitch
     mdiToggleSwitchOffOutline = mdiToggleSwitchOffOutline
     mdiLockOutline = mdiLockOutline
@@ -182,7 +187,7 @@ export default class MiscellaneousSlider extends Mixins(BaseMixin) {
 
     @Debounce(500)
     changeSliderValue(): void {
-        if (this.value === this.sliderValue) return
+        //if (this.value === this.sliderValue) return
         /**
          * snap slider handle to 0 if dragging from above 'off_below' to below 'off_below'
          * snap slider handle to 'off_below' if dragging from 0 to below 'off_below'
@@ -197,13 +202,14 @@ export default class MiscellaneousSlider extends Mixins(BaseMixin) {
     }
 
     sendCmd(newVal: number): void {
-        if (this.value === newVal) return
+        //if (this.value === newVal) return
 
         let gcode = ''
         if (newVal < this.min) newVal = 0
         newVal = newVal * this.multi
         if (this.type === 'fan') gcode = `M106 S${newVal.toFixed(0)}`
         if (this.type === 'fan_generic') gcode = `SET_FAN_SPEED FAN=${this.name} SPEED=${newVal}`
+        if (this.type === 'servo') gcode = `SET_SERVO SERVO=${this.name} ANGLE=${newVal}`
         if (this.type === 'output_pin') gcode = `SET_PIN PIN=${this.name} VALUE=${newVal.toFixed(2)}`
         if (this.type === 'led')
             gcode = `SET_LED LED=${this.name} ${this.ledChannelName}=${newVal.toFixed(2)} SYNC=0 TRANSMIT=1`

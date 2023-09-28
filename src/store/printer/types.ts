@@ -108,6 +108,14 @@ export interface PrinterStateFan {
     controllable: boolean
 }
 
+export interface PrinterStateServo {
+    name: string
+    type: string
+    maximum_angle: number
+    value: number,
+    controllable: boolean
+}
+
 export interface PrinterStateLight {
     name: string
     type: 'led' | 'neopixel' | 'dotstar' | 'pca9533' | 'pca9632'

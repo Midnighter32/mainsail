@@ -13,6 +13,7 @@ import {
     PrinterStateToolchangeMacro,
     PrinterGetterObject,
     PrinterStateLight,
+    PrinterStateServo,
 } from '@/store/printer/types'
 import { caseInsensitiveSort, formatFrequency, getMacroParams } from '@/plugins/helpers'
 import { RootState } from '@/store/types'
@@ -209,6 +210,32 @@ export const getters: GetterTree<PrinterState, RootState> = {
         })
     },
 
+    getServos: (state, getters) => {
+        const servos: PrinterStateServo[] = []
+        const supportedObjects = ['servo']
+        const objects = getters.getPrinterObjects(supportedObjects)
+
+        const controllableServos = ['servo']
+
+        objects
+            .filter((object: PrinterGetterObject) => {
+                return !object.name.startsWith('_')
+            })
+            .forEach((object: PrinterGetterObject) => {
+                let max_angle = object.config.maximum_servo_angle
+
+                servos.push({
+                    name: object.name,
+                    type: object.type as PrinterStateServo['type'],
+                    maximum_angle: Number(max_angle),
+                    value: object.state.value,
+                    controllable: controllableServos.includes(object.type),
+                })
+            })
+
+        return servos
+    },
+
     getLights: (state, getters) => {
         const lights: PrinterStateLight[] = []
         const supportedObjects = ['dotstar', 'led', 'neopixel', 'pca9533', 'pca9632']
@@ -289,7 +316,7 @@ export const getters: GetterTree<PrinterState, RootState> = {
         })
     },
 
-    getMiscellaneous: (state) => {
+    getMiscellaneous:  (state) => {
         const output: PrinterStateMiscellaneous[] = []
         const supportedObjects = ['controller_fan', 'heater_fan', 'fan_generic', 'fan', 'output_pin']
 
